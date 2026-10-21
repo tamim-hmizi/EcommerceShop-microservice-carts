@@ -40,7 +40,11 @@ jobs:
           exit 1
         shell: bash
       - name: Test
-        run: npm test
+        run: npm test 2>&1 | tee test.log; exit ${PIPESTATUS[0]}
+        shell: bash
+      - name: Report test log
+        if: failure()
+        run: grep -v '^\s*$' test.log | head -60 | sed 's/^/::error::/'
         env:
           MONGO_URI: mongodb://127.0.0.1:27017
       - name: Syntax check

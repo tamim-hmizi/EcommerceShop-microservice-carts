@@ -1,4 +1,5 @@
 import express from "express";
+import rateLimit from "express-rate-limit";
 import cartRoutes from "./routes/cartRoutes.js";
 import { client, httpRequestDurationMicroseconds } from "./utils/metrics.js";
 
@@ -27,7 +28,17 @@ app.get("/api/carts/metrics", async (req, res) => {
   res.end(await client.register.metrics());
 });
 
+// Behind the ingress, use the client IP from X-Forwarded-For.
+app.set("trust proxy", 1);
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 300,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+});
+
 // API routes
-app.use("/api/carts", cartRoutes);
+app.use("/api/carts", apiLimiter, cartRoutes);
 
 export default app;

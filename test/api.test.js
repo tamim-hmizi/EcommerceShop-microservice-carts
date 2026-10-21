@@ -5,7 +5,6 @@ import request from 'supertest';
 import app from '../src/app.js';
 import { bearer, useDatabase } from './helpers.js';
 
-useDatabase();
 
 const base = '/api/carts';
 const userId = new mongoose.Types.ObjectId().toString();
@@ -13,6 +12,8 @@ const productId = new mongoose.Types.ObjectId().toString();
 const auth = () => bearer(userId);
 
 describe('carts service', () => {
+  useDatabase();
+
   it('requires a token', async () => {
     await request(app).get(base).expect(401);
   });

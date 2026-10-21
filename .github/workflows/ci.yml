@@ -37,6 +37,9 @@ jobs:
             sleep 2
           done
           echo "MongoDB did not start" >&2
+          cat /etc/os-release | grep PRETTY | sed 's/^/::error::/'
+          docker ps -a | sed 's/^/::error::/'
+          docker logs "$(docker ps -aq | head -1)" 2>&1 | tail -30 | sed 's/^/::error::/'
           exit 1
         shell: bash
       - name: Test

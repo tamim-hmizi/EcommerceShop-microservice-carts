@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       mongo:
-        image: mongo:8
+        image: mongo:9.0
         ports:
           - 27017:27017
     steps:
@@ -32,6 +32,7 @@ jobs:
       - run: npm audit --audit-level=low
       - name: Wait for MongoDB
         run: |
+          echo "::notice::kernel $(uname -r)"
           for i in $(seq 1 60); do
             (echo > /dev/tcp/127.0.0.1/27017) 2>/dev/null && exit 0
             sleep 2

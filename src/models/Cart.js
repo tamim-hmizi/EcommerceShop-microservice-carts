@@ -37,9 +37,8 @@ const cartSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-cartSchema.pre('save', function (next) {
+cartSchema.pre('save', function () {
   this.lastUpdated = Date.now();
-  next();
 });
 
 export default mongoose.model('Cart', cartSchema);

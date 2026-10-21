@@ -32,23 +32,16 @@ jobs:
       - run: npm audit --audit-level=low
       - name: Wait for MongoDB
         run: |
-          echo "::notice::kernel $(uname -r)"
           for i in $(seq 1 60); do
             (echo > /dev/tcp/127.0.0.1/27017) 2>/dev/null && exit 0
             sleep 2
           done
           echo "MongoDB did not start" >&2
-          cat /etc/os-release | grep PRETTY | sed 's/^/::error::/'
-          docker ps -a | sed 's/^/::error::/'
           docker logs "$(docker ps -aq | head -1)" 2>&1 | tail -30 | sed 's/^/::error::/'
           exit 1
         shell: bash
       - name: Test
-        run: npm test 2>&1 | tee test.log; exit ${PIPESTATUS[0]}
-        shell: bash
-      - name: Report test log
-        if: failure()
-        run: grep -v '^\s*$' test.log | head -60 | sed 's/^/::error::/'
+        run: npm test
         env:
           MONGO_URI: mongodb://127.0.0.1:27017
       - name: Syntax check
